@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="宇羲英文">
+  <meta name="description" content="宇羲的英文 Sight Word 字卡學習 App">
+  <title>宇羲英文 — Sight Word 字卡</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2285%22>📚</text></svg>">
+</head>
+
+<body>
+  <div id="app">
+
+    <!-- ====== Screen: Level Selection ====== -->
+    <div id="screen-home" class="screen active">
+      <header class="app-header">
+        <div class="app-logo">📚</div>
+        <h1 class="app-title">宇羲英文</h1>
+        <p class="app-subtitle">Sight Word 字卡學習</p>
+      </header>
+
+      <div class="level-grid" id="level-grid">
+        <!-- Dynamically generated from words.js -->
+      </div>
+
+      <div class="total-stats">
+        <div class="stats-label">總共已學會</div>
+        <div class="stats-number" id="total-learned">0</div>
+        <div class="stats-detail" id="total-detail">/ 300 個 Sight Words</div>
+      </div>
+    </div>
+
+    <!-- ====== Screen: Flash Card Study ====== -->
+    <div id="screen-study" class="screen">
+      <div class="study-header">
+        <button class="btn-back" id="btn-back" aria-label="返回">←</button>
+        <div class="study-level-name" id="study-level-name">Pre-K</div>
+        <div class="study-counter" id="study-counter">1/40</div>
+      </div>
+
+      <div class="study-progress">
+        <div class="study-progress-fill" id="study-progress-fill" style="width: 0%"></div>
+      </div>
+
+      <div class="card-container" id="card-container">
+        <div class="flashcard" id="flashcard">
+          <!-- Front -->
+          <div class="card-face card-front">
+            <button class="btn-speak" id="btn-speak-front" aria-label="朗讀">🔊</button>
+            <div class="card-word" id="card-word">hello</div>
+            <div class="card-tap-hint">👆 點一下翻牌</div>
+          </div>
+          <!-- Back -->
+          <div class="card-face card-back">
+            <button class="btn-speak" id="btn-speak-back" aria-label="朗讀">🔊</button>
+            <div class="card-back-word" id="card-back-word">hello</div>
+            <div class="card-meaning" id="card-meaning">你好</div>
+            <div class="card-example">
+              <div class="card-example-en" id="card-example-en">Hello, how are you?</div>
+              <div class="card-example-zh" id="card-example-zh">你好，你好嗎？</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swipe-hint">⟵ 左滑再練習 ｜ 右滑學會了 ⟶</div>
+
+      <div class="action-buttons">
+        <button class="btn-action btn-retry" id="btn-retry">
+          <span>✗</span> 再練習
+        </button>
+        <button class="btn-action btn-got-it" id="btn-got-it">
+          <span>✓</span> 認識了
+        </button>
+      </div>
+    </div>
+
+    <!-- ====== Screen: Complete ====== -->
+    <div id="screen-complete" class="screen complete-screen">
+      <div class="celebration-emoji">🎉</div>
+      <h2 class="complete-title">太棒了！全部完成！</h2>
+      <p class="complete-subtitle" id="complete-subtitle">你把 Pre-K 的字都練習完了</p>
+
+      <div class="complete-stats">
+        <div class="stat-box">
+          <div class="stat-value" id="stat-known">0</div>
+          <div class="stat-label">認識了</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="stat-retry">0</div>
+          <div class="stat-label">需要再練習</div>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="btn-retry-wrong">
+        🔄 再練習不熟的字
+      </button>
+      <button class="btn-secondary" id="btn-go-home" style="margin-top: var(--space-sm);">
+        🏠 回到主畫面
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Streak Banner -->
+  <div class="streak-banner" id="streak-banner">🔥 連續答對！</div>
+
+  <!-- Star Burst container -->
+  <div class="star-burst" id="star-burst"></div>
+
+  <script src="words.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>
