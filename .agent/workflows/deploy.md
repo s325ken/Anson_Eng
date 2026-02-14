@@ -22,4 +22,4 @@ cd ~/日常小程式/宇羲英文 && git push origin main
 ```
 
 After pushing, GitHub Pages will automatically update in about 1 minute.
-The site will be available at: https://<your-username>.github.io/yuxi-english/
+The site will be available at: https://s325ken.github.io/Anson_Eng/

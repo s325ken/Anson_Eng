@@ -100,31 +100,84 @@ body {
   position: relative;
 }
 
-/* ---- Background Decorations ---- */
-body::before,
-body::after {
-  content: '';
+/* ---- Background Photo Decorations ---- */
+.bg-photos {
   position: fixed;
-  border-radius: 50%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   z-index: 0;
-  opacity: 0.15;
   pointer-events: none;
+  overflow: hidden;
 }
 
-body::before {
-  width: 300px;
-  height: 300px;
-  background: var(--accent-pink);
-  top: -80px;
-  right: -80px;
+.bg-photo {
+  position: absolute;
+  background-size: cover;
+  background-position: center;
+  border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+  opacity: 0.12;
+  filter: blur(6px) saturate(1.2);
+  transition: opacity 1s ease;
 }
 
-body::after {
-  width: 250px;
-  height: 250px;
-  background: var(--accent-blue);
-  bottom: -60px;
-  left: -60px;
+.bg-photo-1 {
+  background-image: url('images/bg1.jpg');
+  width: 55vmax;
+  height: 55vmax;
+  top: -15%;
+  right: -10%;
+  animation: bgDrift1 25s ease-in-out infinite alternate;
+}
+
+.bg-photo-2 {
+  background-image: url('images/bg2.jpg');
+  width: 45vmax;
+  height: 45vmax;
+  bottom: -10%;
+  left: -8%;
+  animation: bgDrift2 30s ease-in-out infinite alternate;
+}
+
+.bg-photo-3 {
+  background-image: url('images/bg3.jpg');
+  width: 35vmax;
+  height: 35vmax;
+  top: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: bgDrift3 20s ease-in-out infinite alternate;
+}
+
+@keyframes bgDrift1 {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  100% {
+    transform: translate(-30px, 20px) rotate(3deg);
+  }
+}
+
+@keyframes bgDrift2 {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  100% {
+    transform: translate(20px, -25px) rotate(-2deg);
+  }
+}
+
+@keyframes bgDrift3 {
+  0% {
+    transform: translateX(-50%) translate(0, 0) rotate(0deg);
+  }
+
+  100% {
+    transform: translateX(-50%) translate(-15px, -20px) rotate(2deg);
+  }
 }
 
 /* ---- App Container ---- */
@@ -168,8 +221,15 @@ body::after {
 }
 
 @keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .app-title {
@@ -233,9 +293,17 @@ body::after {
   height: 100%;
 }
 
-.level-card[data-level="Pre-K"]::before { background: var(--level-prek); }
-.level-card[data-level="Kindergarten"]::before { background: var(--level-k); }
-.level-card[data-level="1st Grade"]::before { background: var(--level-1st); }
+.level-card[data-level="Pre-K"]::before {
+  background: var(--level-prek);
+}
+
+.level-card[data-level="Kindergarten"]::before {
+  background: var(--level-k);
+}
+
+.level-card[data-level="1st Grade"]::before {
+  background: var(--level-1st);
+}
 
 .level-icon {
   width: 60px;
@@ -248,9 +316,17 @@ body::after {
   flex-shrink: 0;
 }
 
-.level-card[data-level="Pre-K"] .level-icon { background: linear-gradient(135deg, #ffeaa7, #fdcb6e); }
-.level-card[data-level="Kindergarten"] .level-icon { background: linear-gradient(135deg, #dfe6e9, #74b9ff); }
-.level-card[data-level="1st Grade"] .level-icon { background: linear-gradient(135deg, #dfe6e9, #a29bfe); }
+.level-card[data-level="Pre-K"] .level-icon {
+  background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+}
+
+.level-card[data-level="Kindergarten"] .level-icon {
+  background: linear-gradient(135deg, #dfe6e9, #74b9ff);
+}
+
+.level-card[data-level="1st Grade"] .level-icon {
+  background: linear-gradient(135deg, #dfe6e9, #a29bfe);
+}
 
 .level-info {
   flex: 1;
@@ -290,9 +366,17 @@ body::after {
   min-width: 0;
 }
 
-.level-card[data-level="Pre-K"] .progress-fill { background: linear-gradient(90deg, #ffeaa7, #fdcb6e); }
-.level-card[data-level="Kindergarten"] .progress-fill { background: linear-gradient(90deg, #74b9ff, #0984e3); }
-.level-card[data-level="1st Grade"] .progress-fill { background: linear-gradient(90deg, #a29bfe, #6c63ff); }
+.level-card[data-level="Pre-K"] .progress-fill {
+  background: linear-gradient(90deg, #ffeaa7, #fdcb6e);
+}
+
+.level-card[data-level="Kindergarten"] .progress-fill {
+  background: linear-gradient(90deg, #74b9ff, #0984e3);
+}
+
+.level-card[data-level="1st Grade"] .progress-fill {
+  background: linear-gradient(90deg, #a29bfe, #6c63ff);
+}
 
 .progress-text {
   font-size: 0.75rem;
@@ -307,7 +391,7 @@ body::after {
   margin-top: var(--space-xl);
   text-align: center;
   padding: var(--space-md);
-  background: rgba(255,255,255,0.7);
+  background: rgba(255, 255, 255, 0.7);
   border-radius: var(--radius-md);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -350,7 +434,7 @@ body::after {
   border-radius: var(--radius-full);
   border: none;
   background: var(--card-bg);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   font-size: 1.4rem;
   cursor: pointer;
   display: flex;
@@ -433,13 +517,27 @@ body::after {
 }
 
 @keyframes swipeLeft {
-  0% { transform: translateX(0) rotate(0deg); opacity: 1; }
-  100% { transform: translateX(-120%) rotate(-15deg); opacity: 0; }
+  0% {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(-120%) rotate(-15deg);
+    opacity: 0;
+  }
 }
 
 @keyframes swipeRight {
-  0% { transform: translateX(0) rotate(0deg); opacity: 1; }
-  100% { transform: translateX(120%) rotate(15deg); opacity: 0; }
+  0% {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(120%) rotate(15deg);
+    opacity: 0;
+  }
 }
 
 .card-face {
@@ -495,8 +593,15 @@ body::after {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
+
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
 
 .card-back {
@@ -520,7 +625,7 @@ body::after {
 }
 
 .card-example {
-  background: rgba(255,255,255,0.15);
+  background: rgba(255, 255, 255, 0.15);
   border-radius: var(--radius-md);
   padding: var(--space-md);
   width: 100%;
@@ -647,10 +752,23 @@ body::after {
 }
 
 @keyframes celebrationBounce {
-  0%, 100% { transform: translateY(0) scale(1); }
-  25% { transform: translateY(-20px) scale(1.1); }
-  50% { transform: translateY(0) scale(1); }
-  75% { transform: translateY(-10px) scale(1.05); }
+
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+
+  25% {
+    transform: translateY(-20px) scale(1.1);
+  }
+
+  50% {
+    transform: translateY(0) scale(1);
+  }
+
+  75% {
+    transform: translateY(-10px) scale(1.05);
+  }
 }
 
 .complete-title {
@@ -773,6 +891,7 @@ body::after {
     opacity: 1;
     transform: translateY(0) scale(1) rotate(0deg);
   }
+
   100% {
     opacity: 0;
     transform: translateY(100px) scale(0) rotate(360deg);
@@ -805,11 +924,30 @@ body::after {
 }
 
 @keyframes streakPop {
-  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-  20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-  30% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-  80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-  100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+
+  20% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 1;
+  }
+
+  30% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+
+  80% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0;
+  }
 }
 
 /* ============================================
@@ -921,6 +1059,11 @@ body::after {
   .btn-speak {
     background: rgba(108, 99, 255, 0.2);
   }
+
+  .bg-photo {
+    opacity: 0.08;
+    filter: blur(8px) saturate(0.8);
+  }
 }
 
 /* ============================================
@@ -939,5 +1082,9 @@ body::after {
 
   .star {
     animation: none;
+  }
+
+  .bg-photo {
+    animation: none !important;
   }
 }
