@@ -29,6 +29,7 @@
         retryWords: new Set(),
         streak: 0,
         progress: loadProgress(),
+        muted: loadMuted(),
     };
 
     // ---- DOM References ----
@@ -74,6 +75,12 @@
         buildLevelCards();
         updateHomeScreen();
         bindEvents();
+        // Sync mute button icon on load
+        const muteBtn = $('#btn-mute');
+        if (muteBtn) {
+            muteBtn.textContent = state.muted ? '🔇' : '🔊';
+            muteBtn.title = state.muted ? '開啟發音' : '關閉發音';
+        }
     }
 
     // ---- Build Level Cards Dynamically ----
@@ -128,6 +135,33 @@
             localStorage.setItem('yuxi-sightwords-progress', JSON.stringify(state.progress));
         } catch (e) {
             console.warn('Failed to save progress:', e);
+        }
+    }
+
+    function loadMuted() {
+        try {
+            return localStorage.getItem('yuxi-sightwords-muted') === 'true';
+        } catch {
+            return false;
+        }
+    }
+
+    function saveMuted() {
+        try {
+            localStorage.setItem('yuxi-sightwords-muted', state.muted ? 'true' : 'false');
+        } catch (e) { /* ignore */ }
+    }
+
+    function toggleMute() {
+        state.muted = !state.muted;
+        saveMuted();
+        const btn = $('#btn-mute');
+        if (btn) {
+            btn.textContent = state.muted ? '🔇' : '🔊';
+            btn.title = state.muted ? '開啟發音' : '關閉發音';
+        }
+        if (state.muted) {
+            window.speechSynthesis?.cancel();
         }
     }
 
@@ -324,6 +358,7 @@
 
     // ---- Speech (Web Speech API) ----
     function speakWord(text) {
+        if (state.muted) return;
         if (!('speechSynthesis' in window)) return;
 
         window.speechSynthesis.cancel();
@@ -356,19 +391,21 @@
         let touchStartY = 0;
         let touchStartTime = 0;
         let isSwiping = false;
+        let touchHandled = false;
 
         const container = els.cardContainer;
 
         container.addEventListener('touchstart', (e) => {
-            if (e.target.closest('.btn-speak')) return;
+            if (e.target.closest('.btn-speak') || e.target.closest('.btn-mute')) return;
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
             touchStartTime = Date.now();
             isSwiping = false;
+            touchHandled = false;
         }, { passive: true });
 
         container.addEventListener('touchmove', (e) => {
-            if (e.target.closest('.btn-speak')) return;
+            if (e.target.closest('.btn-speak') || e.target.closest('.btn-mute')) return;
 
             const dx = e.touches[0].clientX - touchStartX;
             const dy = e.touches[0].clientY - touchStartY;
@@ -384,13 +421,15 @@
         }, { passive: true });
 
         container.addEventListener('touchend', (e) => {
-            if (e.target.closest('.btn-speak')) return;
+            if (e.target.closest('.btn-speak') || e.target.closest('.btn-mute')) return;
 
             const dx = e.changedTouches[0].clientX - touchStartX;
             const duration = Date.now() - touchStartTime;
 
             els.flashcard.style.transition = '';
             els.flashcard.style.transform = '';
+
+            touchHandled = true;
 
             if (isSwiping && Math.abs(dx) > 80) {
                 if (dx > 0) {
@@ -404,7 +443,12 @@
         }, { passive: true });
 
         container.addEventListener('click', (e) => {
-            if (e.target.closest('.btn-speak')) return;
+            if (e.target.closest('.btn-speak') || e.target.closest('.btn-mute')) return;
+            // Skip if touch already handled (prevents double-flip on iPad)
+            if (touchHandled) {
+                touchHandled = false;
+                return;
+            }
             if (!isSwiping) {
                 flipCard();
             }
@@ -450,7 +494,7 @@
         els.streakBanner.classList.remove('show');
         void els.streakBanner.offsetWidth;
         els.streakBanner.classList.add('show');
-        setTimeout(() => els.streakBanner.classList.remove('show'), 1600);
+        setTimeout(() => els.streakBanner.classList.remove('show'), 1200);
     }
 
     // ---- Utilities ----
@@ -484,6 +528,15 @@
 
         els.btnRetry.addEventListener('click', markRetry);
         els.btnGotIt.addEventListener('click', markKnown);
+
+        // Mute toggle
+        const muteBtn = $('#btn-mute');
+        if (muteBtn) {
+            muteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleMute();
+            });
+        }
 
         els.btnRetryWrong.addEventListener('click', retryWrongWords);
         els.btnGoHome.addEventListener('click', () => {
