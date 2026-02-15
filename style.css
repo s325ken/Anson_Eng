@@ -978,6 +978,217 @@ body {
 }
 
 /* ============================================
+   Word List Button on Level Cards
+   ============================================ */
+.btn-wordlist {
+  border: none;
+  background: rgba(0, 0, 0, 0.05);
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-wordlist:active {
+  transform: scale(0.9);
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   Word List Modal
+   ============================================ */
+.wordlist-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  padding: var(--space-md);
+}
+
+.wordlist-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.wordlist-modal {
+  background: var(--card-bg);
+  border-radius: var(--radius-xl);
+  width: 100%;
+  max-width: 480px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+  transform: translateY(20px);
+  transition: transform 0.25s ease;
+}
+
+.wordlist-overlay.show .wordlist-modal {
+  transform: translateY(0);
+}
+
+.wordlist-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-lg);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+}
+
+.wordlist-title {
+  font-family: var(--font-zh);
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.wordlist-close {
+  border: none;
+  background: rgba(0, 0, 0, 0.06);
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: background var(--transition-fast);
+}
+
+.wordlist-close:active {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.wordlist-body {
+  overflow-y: auto;
+  padding: var(--space-sm) 0;
+  flex: 1;
+  -webkit-overflow-scrolling: touch;
+}
+
+.wordlist-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-lg);
+  transition: background var(--transition-fast);
+}
+
+.wordlist-item.learned {
+  background: rgba(0, 184, 148, 0.06);
+}
+
+.wordlist-status {
+  font-size: 1rem;
+  flex-shrink: 0;
+  width: 28px;
+  text-align: center;
+}
+
+.wordlist-word {
+  font-family: var(--font-en);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.wordlist-meaning {
+  font-family: var(--font-zh);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+.wordlist-footer {
+  padding: var(--space-md) var(--space-lg);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  font-family: var(--font-zh);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* Word List Section Headers (for All Words view) */
+.wordlist-section {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--card-bg);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.wordlist-section-icon {
+  font-size: 1.1rem;
+}
+
+.wordlist-section-name {
+  font-family: var(--font-zh);
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.wordlist-section-count {
+  font-family: var(--font-en);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  background: rgba(108, 99, 255, 0.1);
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+}
+
+/* All Words Button */
+.btn-all-words {
+  border: none;
+  background: rgba(108, 99, 255, 0.12);
+  color: var(--primary);
+  font-family: var(--font-zh);
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: var(--space-xs) var(--space-lg);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  margin-top: var(--space-sm);
+  transition: all var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-all-words:active {
+  transform: scale(0.95);
+  background: rgba(108, 99, 255, 0.2);
+}
+
+/* ============================================
    Streak Banner — Top Toast (non-blocking)
    ============================================ */
 .streak-banner {

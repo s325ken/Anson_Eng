@@ -89,6 +89,7 @@
         updateHomeScreen();
         bindEvents();
         bindTabEvents();
+        bindWordListEvents();
         // Sync mute button icon on load
         const muteBtn = $('#btn-mute');
         if (muteBtn) {
@@ -125,9 +126,20 @@
             <span class="progress-text" data-level-text="${level}">0/${total}</span>
           </div>
         </div>
+        <button class="btn-wordlist" data-level="${level}" aria-label="單字列表">📋</button>
       `;
 
-            card.addEventListener('click', () => startLevel(level));
+            // Card click → study
+            card.addEventListener('click', (e) => {
+                if (e.target.closest('.btn-wordlist')) return;
+                startLevel(level);
+            });
+            // List button click → word list modal
+            const listBtn = card.querySelector('.btn-wordlist');
+            listBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showWordList(level);
+            });
             els.levelGrid.appendChild(card);
         });
 
@@ -646,6 +658,109 @@
                 updateHomeScreen();
             });
         });
+    }
+
+    // ---- Word List Modal ----
+    function showWordList(level) {
+        const wordData = getWordData();
+        const words = wordData[level] || [];
+        const learnedSet = new Set(state.progress[level] || []);
+
+        const overlay = $('#wordlist-overlay');
+        const title = $('#wordlist-title');
+        const body = $('#wordlist-body');
+        const footer = $('#wordlist-footer');
+
+        title.textContent = level;
+
+        // Build word list
+        let html = '';
+        words.forEach((w) => {
+            const isLearned = learnedSet.has(w.word);
+            const statusIcon = isLearned ? '✅' : '⬜';
+            const learnedClass = isLearned ? 'learned' : '';
+
+            html += `<div class="wordlist-item ${learnedClass}">
+                <span class="wordlist-status">${statusIcon}</span>
+                <span class="wordlist-word">${w.word}</span>
+                <span class="wordlist-meaning">${w.meaning}</span>
+            </div>`;
+        });
+
+        body.innerHTML = html;
+
+        // Footer summary
+        const learnedCount = learnedSet.size;
+        footer.textContent = `已學會 ${learnedCount} / ${words.length} 個字`;
+
+        overlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function showAllWordList() {
+        const wordData = getWordData();
+        const config = getConfig();
+        const levels = Object.keys(wordData);
+
+        const overlay = $('#wordlist-overlay');
+        const title = $('#wordlist-title');
+        const body = $('#wordlist-body');
+        const footer = $('#wordlist-footer');
+
+        const modeLabel = state.mode === 'phonics' ? '自然發音' : 'Sight Words';
+        title.textContent = `${modeLabel} 全部單字`;
+
+        let html = '';
+        let totalWords = 0;
+        let totalLearned = 0;
+
+        levels.forEach((level) => {
+            const words = wordData[level] || [];
+            const learnedSet = new Set(state.progress[level] || []);
+            const cfg = config[level] || DEFAULT_CONFIG;
+            const levelLearned = words.filter(w => learnedSet.has(w.word)).length;
+            totalWords += words.length;
+            totalLearned += levelLearned;
+
+            // Section header
+            html += `<div class="wordlist-section">
+                <span class="wordlist-section-icon">${cfg.icon}</span>
+                <span class="wordlist-section-name">${level}</span>
+                <span class="wordlist-section-count">${levelLearned}/${words.length}</span>
+            </div>`;
+
+            words.forEach((w) => {
+                const isLearned = learnedSet.has(w.word);
+                const statusIcon = isLearned ? '✅' : '⬜';
+                const learnedClass = isLearned ? 'learned' : '';
+
+                html += `<div class="wordlist-item ${learnedClass}">
+                    <span class="wordlist-status">${statusIcon}</span>
+                    <span class="wordlist-word">${w.word}</span>
+                    <span class="wordlist-meaning">${w.meaning}</span>
+                </div>`;
+            });
+        });
+
+        body.innerHTML = html;
+        footer.textContent = `已學會 ${totalLearned} / ${totalWords} 個字`;
+
+        overlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeWordList() {
+        const overlay = $('#wordlist-overlay');
+        overlay.classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    function bindWordListEvents() {
+        $('#wordlist-close').addEventListener('click', closeWordList);
+        $('#wordlist-overlay').addEventListener('click', (e) => {
+            if (e.target.id === 'wordlist-overlay') closeWordList();
+        });
+        $('#btn-all-words').addEventListener('click', showAllWordList);
     }
 
     // ---- Start App ----

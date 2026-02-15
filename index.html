@@ -46,6 +46,7 @@
         <div class="stats-label">總共已學會</div>
         <div class="stats-number" id="total-learned">0</div>
         <div class="stats-detail" id="total-detail">/ 300 個 Sight Words</div>
+        <button class="btn-all-words" id="btn-all-words">📋 全部單字</button>
       </div>
     </div>
 
@@ -121,6 +122,20 @@
       </button>
     </div>
 
+  </div>
+
+  <!-- Word List Modal -->
+  <div class="wordlist-overlay" id="wordlist-overlay">
+    <div class="wordlist-modal">
+      <div class="wordlist-header">
+        <h2 class="wordlist-title" id="wordlist-title">Level 1</h2>
+        <button class="wordlist-close" id="wordlist-close">✕</button>
+      </div>
+      <div class="wordlist-body" id="wordlist-body">
+        <!-- Dynamically generated -->
+      </div>
+      <div class="wordlist-footer" id="wordlist-footer"></div>
+    </div>
   </div>
 
   <!-- Streak Banner -->
