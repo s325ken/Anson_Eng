@@ -208,6 +208,64 @@ body {
   display: flex;
 }
 
+/* Tab Bar */
+.tab-bar {
+  display: flex;
+  gap: var(--space-xs);
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: var(--radius-full);
+  padding: 4px;
+  width: 100%;
+  margin-bottom: var(--space-md);
+}
+
+.tab {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-full);
+  font-family: var(--font-zh);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tab.active {
+  background: var(--card-bg);
+  color: var(--primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.tab:active {
+  transform: scale(0.97);
+}
+
+/* Phonics Highlight */
+.ph-hl {
+  color: #e84393;
+  font-weight: inherit;
+  text-decoration: underline;
+  text-decoration-color: #e8439380;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 3px;
+}
+
+/* Card Rule Badge */
+.card-rule {
+  font-family: var(--font-zh);
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.2);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+  margin-bottom: var(--space-sm);
+  opacity: 0.9;
+}
+
 /* Header */
 .app-header {
   text-align: center;
@@ -1082,6 +1140,10 @@ body {
   .bg-photo {
     opacity: 0.08;
     filter: blur(8px) saturate(0.8);
+  }
+
+  .tab-bar {
+    background: rgba(255, 255, 255, 0.08);
   }
 }
 

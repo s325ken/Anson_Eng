@@ -21,6 +21,7 @@
 
     // ---- State ----
     const state = {
+        mode: 'sight', // 'sight' or 'phonics'
         currentLevel: null,
         currentWords: [],
         currentIndex: 0,
@@ -31,6 +32,17 @@
         progress: loadProgress(),
         muted: loadMuted(),
     };
+
+    // ---- Data Helpers ----
+    function getWordData() {
+        return state.mode === 'phonics' ? PHONICS_WORDS : SIGHT_WORDS;
+    }
+    function getConfig() {
+        return state.mode === 'phonics' ? PHONICS_CONFIG : LEVEL_CONFIG;
+    }
+    function getProgressKey() {
+        return state.mode === 'phonics' ? 'yuxi-phonics-progress' : 'yuxi-sightwords-progress';
+    }
 
     // ---- DOM References ----
     const $ = (sel) => document.querySelector(sel);
@@ -55,6 +67,7 @@
         cardWord: $('#card-word'),
         cardBackWord: $('#card-back-word'),
         cardMeaning: $('#card-meaning'),
+        cardRule: $('#card-rule'),
         cardExampleEn: $('#card-example-en'),
         cardExampleZh: $('#card-example-zh'),
         btnSpeakFront: $('#btn-speak-front'),
@@ -75,6 +88,7 @@
         buildLevelCards();
         updateHomeScreen();
         bindEvents();
+        bindTabEvents();
         // Sync mute button icon on load
         const muteBtn = $('#btn-mute');
         if (muteBtn) {
@@ -85,26 +99,28 @@
 
     // ---- Build Level Cards Dynamically ----
     function buildLevelCards() {
-        const levels = Object.keys(SIGHT_WORDS);
+        const wordData = getWordData();
+        const config = getConfig();
+        const levels = Object.keys(wordData);
         els.levelGrid.innerHTML = '';
 
-        levels.forEach((level, index) => {
-            const config = LEVEL_CONFIG[level] || DEFAULT_CONFIG;
-            const total = SIGHT_WORDS[level].length;
+        levels.forEach((level) => {
+            const cfg = config[level] || DEFAULT_CONFIG;
+            const total = wordData[level].length;
 
             const card = document.createElement('div');
             card.className = 'level-card';
             card.setAttribute('data-level', level);
-            card.style.setProperty('--level-color', config.color);
+            card.style.setProperty('--level-color', cfg.color);
 
             card.innerHTML = `
-        <div class="level-icon" style="background: linear-gradient(135deg, ${config.color}40, ${config.color})">${config.icon}</div>
+        <div class="level-icon" style="background: linear-gradient(135deg, ${cfg.color}40, ${cfg.color})">${cfg.icon}</div>
         <div class="level-info">
           <div class="level-name">${level}</div>
-          <div class="level-desc">${config.desc} — ${total} 個字</div>
+          <div class="level-desc">${cfg.desc} — ${total} 個字</div>
           <div class="level-progress">
             <div class="progress-bar">
-              <div class="progress-fill" data-level="${level}" style="width: 0%; background: linear-gradient(90deg, ${config.color}80, ${config.color})"></div>
+              <div class="progress-fill" data-level="${level}" style="width: 0%; background: linear-gradient(90deg, ${cfg.color}80, ${cfg.color})"></div>
             </div>
             <span class="progress-text" data-level-text="${level}">0/${total}</span>
           </div>
@@ -116,14 +132,16 @@
         });
 
         // Update total
-        const totalWords = Object.values(SIGHT_WORDS).reduce((sum, arr) => sum + arr.length, 0);
-        els.totalDetail.textContent = `/ ${totalWords} 個 Sight Words`;
+        const totalWords = Object.values(wordData).reduce((sum, arr) => sum + arr.length, 0);
+        const label = state.mode === 'phonics' ? '個 Phonics 單字' : '個 Sight Words';
+        els.totalDetail.textContent = `/ ${totalWords} ${label}`;
     }
 
     // ---- LocalStorage Progress ----
     function loadProgress() {
         try {
-            const data = localStorage.getItem('yuxi-sightwords-progress');
+            const key = state ? getProgressKey() : 'yuxi-sightwords-progress';
+            const data = localStorage.getItem(key);
             return data ? JSON.parse(data) : {};
         } catch {
             return {};
@@ -132,7 +150,7 @@
 
     function saveProgress() {
         try {
-            localStorage.setItem('yuxi-sightwords-progress', JSON.stringify(state.progress));
+            localStorage.setItem(getProgressKey(), JSON.stringify(state.progress));
         } catch (e) {
             console.warn('Failed to save progress:', e);
         }
@@ -170,12 +188,14 @@
     }
 
     function getTotalCount(level) {
-        return SIGHT_WORDS[level]?.length || 0;
+        const wordData = getWordData();
+        return wordData[level]?.length || 0;
     }
 
     // ---- Home Screen ----
     function updateHomeScreen() {
-        const levels = Object.keys(SIGHT_WORDS);
+        const wordData = getWordData();
+        const levels = Object.keys(wordData);
         let totalLearned = 0;
 
         levels.forEach(level => {
@@ -213,7 +233,8 @@
         state.retryWords = new Set();
         state.streak = 0;
 
-        const allWords = SIGHT_WORDS[level] || [];
+        const wordData = getWordData();
+        const allWords = wordData[level] || [];
         const learnedSet = new Set(state.progress[level] || []);
 
         // Unlearned first, then learned
@@ -239,11 +260,25 @@
         state.isFlipped = false;
         els.flashcard.classList.remove('flipped', 'swipe-left', 'swipe-right');
 
-        els.cardWord.textContent = word.word;
+        // Front: highlight pattern for phonics, plain text for sight words
+        if (state.mode === 'phonics' && word.pattern) {
+            els.cardWord.innerHTML = highlightPattern(word.word, word.pattern);
+        } else {
+            els.cardWord.textContent = word.word;
+        }
+
         els.cardBackWord.textContent = word.word;
         els.cardMeaning.textContent = word.meaning;
         els.cardExampleEn.textContent = word.example;
         els.cardExampleZh.textContent = word.exampleMeaning;
+
+        // Show phonics rule on back
+        if (state.mode === 'phonics' && word.rule) {
+            els.cardRule.textContent = word.rule;
+            els.cardRule.style.display = '';
+        } else {
+            els.cardRule.style.display = 'none';
+        }
 
         const total = state.currentWords.length;
         els.studyCounter.textContent = `${state.currentIndex + 1}/${total}`;
@@ -252,6 +287,26 @@
         els.studyProgressFill.style.width = pct + '%';
 
         speakWord(word.word);
+    }
+
+    // ---- Highlight Phonics Pattern ----
+    function highlightPattern(word, pattern) {
+        if (pattern.includes('_')) {
+            // Magic E split pattern: e.g., "a_e"
+            const vowel = pattern.split('_')[0];
+            let html = word;
+            // Highlight the vowel (first occurrence)
+            html = html.replace(vowel, `<span class="ph-hl">${vowel}</span>`);
+            // Highlight trailing 'e'
+            html = html.replace(/e$/, '<span class="ph-hl">e</span>');
+            return html;
+        }
+        // Regular pattern: highlight the pattern in the word
+        const idx = word.indexOf(pattern);
+        if (idx === -1) return word;
+        return word.substring(0, idx) +
+            `<span class="ph-hl">${pattern}</span>` +
+            word.substring(idx + pattern.length);
     }
 
     // ---- Flip Card ----
@@ -341,7 +396,8 @@
     function retryWrongWords() {
         if (state.retryWords.size === 0) return;
 
-        const allWords = SIGHT_WORDS[state.currentLevel] || [];
+        const wordData = getWordData();
+        const allWords = wordData[state.currentLevel] || [];
         const retryWordsList = allWords.filter(w => state.retryWords.has(w.word));
 
         state.currentWords = shuffle(retryWordsList);
@@ -568,6 +624,27 @@
                         break;
                 }
             }
+        });
+    }
+
+    // ---- Tab Switching ----
+    function bindTabEvents() {
+        const tabs = $$('#tab-bar .tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const newMode = tab.dataset.mode;
+                if (newMode === state.mode) return;
+
+                // Update active tab
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                // Switch mode and reload
+                state.mode = newMode;
+                state.progress = loadProgress();
+                buildLevelCards();
+                updateHomeScreen();
+            });
         });
     }
 
